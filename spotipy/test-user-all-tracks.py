@@ -9,8 +9,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy.oauth2 import SpotifyOAuth
 
 # Configure as credenciais
-client_id = 'a2950780b59843f2bb16eef9dce106db'
-client_secret = '11c7ea7ab76341ee85abcdf95e6c2c86'
+client_id = '0dba842d359e48b9be6523154f3df372'
+client_secret = '8032d41cbfa14674ac9d45ac0a823331'
 scope = "playlist-read-private,playlist-read-collaborative,user-follow-read,user-top-read,user-read-recently-played,user-library-read"
 redirect_uri = "https://example.com/callback"
 
@@ -18,7 +18,7 @@ redirect_uri = "https://example.com/callback"
 client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager, auth_manager=SpotifyOAuth(scope=scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri))
 
-max_requests = 50
+max_requests = 100
 sent_requests = 0
 
 def cooldown():
@@ -32,7 +32,7 @@ def cooldown():
 # Obtém todos os artistas seguidos
 if os.path.isfile('artists_final.json'):
     # Recarrega resultados anteriores, se disponíveis
-    with open('artists_final.json', 'r') as fp:
+    with open('artists_final.json', 'r', encoding="utf8") as fp:
         artists = json.load(fp)
     print("JSON artists_final.json carregado")
 else:
@@ -65,7 +65,7 @@ else:
 # Obtém todos os álbuns
 if os.path.isfile('albums_final.json'):
     # Recarrega resultados anteriores, se disponíveis
-    with open('albums_final.json', 'r') as fp:
+    with open('albums_final.json', 'r', encoding="utf8") as fp:
         albums = json.load(fp)
     print("JSON albums_final.json carregado")
 else:
@@ -97,7 +97,7 @@ else:
 # Obtém todas as faixas dos álbuns
 if os.path.isfile('album_tracks_final.json'):
     # Recarrega resultados anteriores, se disponíveis
-    with open('album_tracks_final.json', 'r') as fp:
+    with open('album_tracks_final.json', 'r', encoding="utf8") as fp:
         album_tracks = json.load(fp)
     print("JSON album_tracks_final.json carregado")
 else:
@@ -134,7 +134,7 @@ for track in album_tracks:
 # Obtém detalhes de todas as faixas
 if os.path.isfile('tracks_final.json'):
     # Recarrega resultados anteriores, se disponíveis
-    with open('tracks_final.json', 'r') as fp:
+    with open('tracks_final.json', 'r', encoding="utf8") as fp:
         tracks = json.load(fp)
     print("JSON tracks_final.json carregado")
 else:
