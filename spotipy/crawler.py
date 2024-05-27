@@ -6,7 +6,6 @@ import spotipy
 import sys
 import time
 
-from requests.exceptions import ReadTimeout
 from spotipy.cache_handler import CacheHandler
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -60,13 +59,15 @@ def reload_credentials():
 
 
 # (Re)carrega instância do Spotipy. A nova instância utilizará o próximo cliente disponível na lista de credenciais atualmente carregadas
-def reload_api():
+def reload_api(failed=False):
     global sp
     global current_client
 
     if len(clients) == 0:
         reload_credentials()
     elif current_client >= len(clients)-1:
+        if failed:
+            reload_credentials()
         current_client = 0
     else:
         current_client += 1
@@ -78,7 +79,7 @@ def reload_api():
     cache_handler = CustomCacheHandler()
 
     auth_manager = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope, cache_handler=cache_handler)
-    sp = spotipy.Spotify(auth_manager=auth_manager)
+    sp = spotipy.Spotify(auth_manager=auth_manager, retries=0, status_retries=0)
 
 
 # Verifica o número de requisições efetuadas e pausa temporariamente a execução, se necessário
@@ -90,7 +91,7 @@ def check_request_limits():
 
     if sent_requests > max_requests:
         sent_requests = 0
-        print('O limite de requisições configurado foi atingido, pausando execução por {:0.0f} segundos'.format(cooldown_delay))
+        print('Limite de requisições atingido, pausando execução por {:0.0f} segundos'.format(cooldown_delay))
         time.sleep(cooldown_delay)
     else:
         sent_requests += 1
@@ -124,9 +125,9 @@ def get_playlist(playlist_id):
             playlist = sp.playlist(playlist_id)
             break;
 
-        except ReadTimeout:
-            print('Timeout ao acessar API do Spotify, recarregando instância')
-            reload_api()
+        except spotipy.exceptions.SpotifyException:
+            print('Falha ao acessar API do Spotify, recarregando instância')
+            reload_api(failed=True)
 
     tracks = playlist['tracks']
 
@@ -141,9 +142,9 @@ def get_playlist(playlist_id):
                     tracks = sp.next(tracks)
                     break;
 
-                except ReadTimeout:
-                    print('Timeout ao acessar API do Spotify, recarregando instância')
-                    reload_api()
+                except spotipy.exceptions.SpotifyException:
+                    print('Falha ao acessar API do Spotify, recarregando instância')
+                    reload_api(failed=True)
 
                     if args.verbose:
                         print('Salvando resultados parciais...')
@@ -168,9 +169,9 @@ def get_album_tracks(album_ids):
                 album = sp.album_tracks(id, limit=50)
                 break;
 
-            except ReadTimeout:
-                print('Timeout ao acessar API do Spotify, recarregando instância')
-                reload_api()
+            except spotipy.exceptions.SpotifyException:
+                print('Falha ao acessar API do Spotify, recarregando instância')
+                reload_api(failed=True)
 
         tracks = album['items']
 
@@ -185,9 +186,9 @@ def get_album_tracks(album_ids):
                         tracks = sp.next(album)
                         break;
 
-                    except ReadTimeout:
-                        print('Timeout ao acessar API do Spotify, recarregando instância')
-                        reload_api()
+                    except spotipy.exceptions.SpotifyException:
+                        print('Falha ao acessar API do Spotify, recarregando instância')
+                        reload_api(failed=True)
 
                         if args.verbose:
                             print('Salvando resultados parciais...')
@@ -213,9 +214,9 @@ def get_features(track_ids):
                     data.extend(sp.audio_features(track_ids[i:i+100]))
                     break;
 
-                except ReadTimeout:
-                    print('Timeout ao acessar API do Spotify, recarregando instância')
-                    reload_api()
+                except spotipy.exceptions.SpotifyException:
+                    print('Falha ao acessar API do Spotify, recarregando instância')
+                    reload_api(failed=True)
 
                     if args.verbose:
                         print('Salvando resultados parciais...')
@@ -228,9 +229,9 @@ def get_features(track_ids):
                 data = sp.audio_features(track_ids)
                 break;
 
-            except ReadTimeout:
-                print('Timeout ao acessar API do Spotify, recarregando instância')
-                reload_api()
+            except spotipy.exceptions.SpotifyException:
+                print('Falha ao acessar API do Spotify, recarregando instância')
+                reload_api(failed=True)
 
     return data
 
@@ -238,7 +239,7 @@ def get_features(track_ids):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.8]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.8.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
