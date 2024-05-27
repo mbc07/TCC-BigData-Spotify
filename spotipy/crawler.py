@@ -55,7 +55,8 @@ def reload_credentials():
     if args.verbose:
         print('{} credenciais de acesso carregadas'.format(len(clients)))
 
-    reload_api()
+    if not 'sp' in globals():
+        reload_api()
 
 
 # (Re)carrega instância do Spotipy. A nova instância utilizará o próximo cliente disponível na lista de credenciais atualmente carregadas
@@ -255,7 +256,7 @@ def get_features(track_ids):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
