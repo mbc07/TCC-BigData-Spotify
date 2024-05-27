@@ -17,7 +17,7 @@ from spotipy.oauth2 import SpotifyOAuth
 # Controle de requisições
 sent_requests = 0
 max_requests = 100
-requests_delay = 0.0
+requests_delay = 0.5
 cooldown_delay = 30.0
 
 # Controle de credenciais
@@ -156,13 +156,23 @@ def get_playlist(playlist_id):
 
 
 # Obtém todas as faixas das IDs de álbum especificadas
-def get_album_tracks(album_ids):
+def get_album_tracks(album_ids, set_name):
     if not 'sp' in globals():
         reload_api()
 
     data = []
+    requested_ids = []
+    
+    if os.path.isfile(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name))):
+        if args.verbose:
+            print('Resultados parciais encontrados, recarregando...')
+        data = load_json(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name)))
+        requested_ids = data[0].pop('crawler_retrieved_album_ids', None)
 
     for id in album_ids:
+        if id in requested_ids:
+            continue
+
         while True:
             try:
                 check_request_limits()
@@ -192,10 +202,16 @@ def get_album_tracks(album_ids):
 
                         if args.verbose:
                             print('Salvando resultados parciais...')
-                        save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(id)))
+                        data[0]['crawler_retrieved_album_ids'] = requested_ids
+                        save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(set_name)))
             else:
                 break
+        requested_ids.append(id)
 
+    if os.path.isfile(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name))):
+        os.remove(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name)))
+    
+    data[0]['crawler_retrieved_album_ids'] = requested_ids
     return data
 
 
@@ -239,7 +255,7 @@ def get_features(track_ids):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.8.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -340,7 +356,7 @@ if args.get_album_tracks:
         if len(data):
             if args.verbose:
                 print('Obtendo faixas de {} álbuns encontrados em "{}"...'.format(len(data), file))
-            album_tracks = get_album_tracks(data)
+            album_tracks = get_album_tracks(data, re.sub('\\.[jJ][sS][oO][nN]', '', file))
 
             save_json(album_tracks, os.path.join(args.out_dir, 'album_tracks_{}'.format(file)))
             if args.verbose:
