@@ -4,6 +4,7 @@ import os
 import re
 import spotipy
 import sys
+import time
 
 from requests.exceptions import ReadTimeout
 from spotipy.cache_handler import CacheHandler
@@ -17,8 +18,8 @@ from spotipy.oauth2 import SpotifyOAuth
 # Controle de requisições
 sent_requests = 0
 max_requests = 100
-requests_delay = 0
-cooldown_delay = 30
+requests_delay = 0.0
+cooldown_delay = 30.0
 
 # Controle de credenciais
 clients = []
@@ -85,12 +86,16 @@ def check_request_limits():
     global sent_requests
     global max_requests
     global cooldown_delay
+    global requests_delay
+
     if sent_requests > max_requests:
         sent_requests = 0
         if args.verbose:
             print('CooldownMsgPlaceholder')
         time.sleep(cooldown_delay)
-    sent_requests += 1
+    else:
+        sent_requests += 1
+        time.sleep(requests_delay)
 
 
 # Deserializa dados de um arquivo JSON para uma variável
@@ -121,10 +126,8 @@ def get_playlist(playlist_id):
             break;
 
         except ReadTimeout:
-            if args.verbose:
-                print('ReadTimeoutMsgPlaceholder')
-                reload_api()
-                # dump_partial?
+            raise RuntimeWarning('Timeout ao acessar API do Spotify, recarregando instância')
+            reload_api()
 
     tracks = playlist['tracks']
 
@@ -140,33 +143,75 @@ def get_playlist(playlist_id):
                     break;
 
                 except ReadTimeout:
+                    raise RuntimeWarning('Timeout ao acessar API do Spotify, recarregando instância')
+                    reload_api()
+
                     if args.verbose:
-                        print('ReadTimeoutMsgPlaceholder')
-                        reload_api()
-                        # dump_partial?
+                        print('Salvando resultados parciais...')
+                    save_json(data, os.path.join(args.out_dir, 'playlist_{}_partial.json'.format(playlist_id)))
         else:
             tracks = None
 
     return data
 
+
+# Obtém recursos de todas as IDs de faixa especificadas
+def get_features(track_ids):
+    if not 'sp' in globals():
+        reload_api()
+
+    data = []
+
+    if len(track_ids) > 100:
+        for i in range(0, len(track_ids), 100):
+            while True:
+                try:
+                    check_request_limits()
+                    data.extend(sp.audio_features(track_ids[i:i+100]))
+                    break;
+
+                except ReadTimeout:
+                    raise RuntimeWarning('Timeout ao acessar API do Spotify, recarregando instância')
+                    reload_api()
+
+                    if args.verbose:
+                        print('Salvando resultados parciais...')
+                    save_json(data, os.path.join(args.out_dir, 'features_{}_partial.json'.format(hash(track_ids[i:i+100]))))
+
+    else:
+        while True:
+            try:
+                check_request_limits()
+                data = sp.audio_features(track_ids)
+                break;
+
+            except ReadTimeout:
+                raise RuntimeWarning('Timeout ao acessar API do Spotify, recarregando instância')
+                reload_api()
+
+    return data
+
+
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.6]', epilog='Extrai dados utilizando a API do Spotify')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.7]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
-parser.add_argument('-i', '--in-dir', default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
-parser.add_argument('-o', '--out-dir', default='.', help='local onde o(s) arquivo(s) gerado(s) serão salvos (padrão: pasta atual)')
+parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
+parser.add_argument('-o', '--out-dir', metavar=('DIR'), default='.', help='local onde o(s) arquivo(s) gerado(s) serão salvos (padrão: pasta atual)')
+parser.add_argument('-j', '--job-file', metavar=('FILE'), help='especifica um arquivo descrevendo tarefas a serem executadas de maneira autônoma')
 
-parser.add_argument('-s', '--split-json', action='extend', nargs=2, metavar=('JSON', 'N'), help='divide o JSON informado em arquivos menores, contendo N entradas cada')
-parser.add_argument('-m', '--merge-json', action='extend', nargs=2, metavar=('PRE', 'OUT'), help='mescla JSONs menores, com nomes de arquivo iniciados em PRE, em um JSON único especificado por OUT')
+parser.add_argument('-s', '--split-json', action='extend', nargs=2, metavar=('FILE', 'N'), help='divide o arquivo informado em arquivos menores, contendo até N itens em cada um')
+parser.add_argument('-m', '--merge-json', action='extend', nargs=2, metavar=('PREFIX', 'FILE'), help='mescla arquivos menores, com nomes iniciados em PREFIX, em um arquivo único especificado por FILE')
 
-parser.add_argument('-p', '--get-playlists', metavar=('JSON'), help='obtém todas as faixas contidas nas playlists listadas no JSON de entrada')
+parser.add_argument('-p', '--get-playlists', metavar=('FILE'), help='obtém todas as faixas contidas nas playlists listadas no arquivo especificado')
+parser.add_argument('-f', '--get-features', nargs='+', metavar=('FILE'), help='obtém todas os recursos das faixas contidas no(s) arquivo(s) especificado(s)')
 
-parser.add_argument('-c', '--credentials', default='credentials.json', help='especifica o JSON com as credenciais de acesso (padrão: .\\credentials.json)')
-parser.add_argument('-t', '--refresh-tokens', default=False, action='store_true', help='verifica se todos os tokens de acesso são válidos, reautenticando se necessário')
+parser.add_argument('-c', '--credentials', metavar=('FILE'), default='credentials.json', help='especifica o arquivo com as credenciais de acesso (padrão: .\\credentials.json)')
+parser.add_argument('-t', '--refresh-tokens', default=False, action='store_true', help='verifica se todos os tokens de acesso do arquivo de credenciais são válidos, reautenticando tokens inválidos se necessário')
 
-parser.add_argument('-v', '--verbose', default=False, action='store_true', help='mostra mensagens de status durante a execução das tarefas')
+parser.add_argument('-v', '--verbose', default=False, action='store_true', help='mostra mensagens de status e depuração durante a execução das tarefas')
 
 args = parser.parse_args()
 
@@ -208,6 +253,11 @@ if args.merge_json:
         print('{} elementos contidos em {} JSONs foram mesclados em {}'.format(len(data), slices, args.merge_json[1]))
     sys.exit()
 
+# Processamento da opção --job-file (-j)
+if args.job_file:
+    print("Função não implementada")
+    sys.exit()
+
 # Processamento da opção --refresh-tokens (-t)
 if args.refresh_tokens:
     reload_credentials()
@@ -228,8 +278,25 @@ if args.get_playlists:
             print('Obtendo faixas da playlist "{}"...'.format(playlist))
         data = get_playlist(id)
 
-        save_json(data, os.path.join(args.out_dir, '{}.json'.format(playlist)))
+        save_json(data, os.path.join(args.out_dir, 'playlist_{}.json'.format(playlist)))
         if args.verbose:
-            print('{} faixas salvas em {}.json'.format(len(data), playlist))
+            print('{} faixas salvas em playlist_{}.json'.format(len(data), playlist))
 
 
+# Processamento da opção --get-features (-f)
+if args.get_features:
+    for file in args.get_features:
+        data = load_json(os.path.join(args.in_dir, file))
+        track_ids = []
+        for item in data:
+            if item['type'] == 'track':
+                track_ids.append(item['id'])
+
+        if len(track_ids):
+            if args.verbose:
+                print('Obtendo recursos para {} faixas encontradas em "{}"...'.format(len(track_ids), file))
+            features = get_features(track_ids)
+
+            save_json(features, os.path.join(args.out_dir, 'features_{}'.format(file)))
+            if args.verbose:
+                print('Recursos de {} faixas salvas em features_{}'.format(len(features), file))
