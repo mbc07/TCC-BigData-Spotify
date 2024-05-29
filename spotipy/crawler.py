@@ -120,47 +120,66 @@ def get_playlist(playlist_id):
         reload_api()
 
     data = []
+    requested_ids = []
 
-    while True:
-        try:
-            check_request_limits()
-            playlist = sp.playlist(playlist_id)
-            break;
+    if os.path.isfile(os.path.join(args.in_dir, 'playlist_{}_partial.json'.format(playlist_id))):
+        if args.verbose:
+            print('Resultados parciais encontrados, recarregando...')
+        data = load_json(os.path.join(args.in_dir, 'playlist_{}_partial.json'.format(playlist_id)))
+        requested_ids = data[0].pop('crawler_retrieved_track_ids', None)
+    else:
+        data.insert(0, {'crawler_retrieved_track_ids': requested_ids})
 
-        except (ReadTimeout, spotipy.exceptions.SpotifyException):
-            print('Falha ao acessar API do Spotify, recarregando instância')
-            reload_api(failed=True)
+    try:
+        while True:
+            try:
+                check_request_limits()
+                playlist = sp.playlist(playlist_id)
+                break
 
-    tracks = playlist['tracks']
+            except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                print('Falha ao acessar API do Spotify, recarregando instância')
+                reload_api(failed=True)
 
-    while tracks:
-        for item in tracks['items']:
-            data.append(item['track'])
+        tracks = playlist['tracks']
 
-        if tracks['next']:
-            while True:
-                try:
-                    check_request_limits()
-                    tracks = sp.next(tracks)
-                    break;
+        while tracks:
+            for item in tracks['items']:
+                if item['track']['id'] in requested_ids:
+                    continue
 
-                except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                    print('Falha ao acessar API do Spotify, recarregando instância')
-                    reload_api(failed=True)
+                data.append(item['track'])
+                requested_ids.append(item['track']['id'])
 
-                    if args.verbose:
-                        print('Salvando resultados parciais...')
-                    save_json(data, os.path.join(args.out_dir, 'playlist_{}_partial.json'.format(playlist_id)))
+            if tracks['next']:
+                while True:
+                    try:
+                        check_request_limits()
+                        tracks = sp.next(tracks)
+                        break
 
-                except KeyboardInterrupt:
-                    if args.verbose:
-                        print('Salvando resultados parciais...')
-                    save_json(data, os.path.join(args.out_dir, 'playlist_{}_partial.json'.format(playlist_id)))
-                    raise
+                    except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                        print('Falha ao acessar API do Spotify, recarregando instância')
+                        reload_api(failed=True)
 
-        else:
-            tracks = None
+                        if args.verbose:
+                            print('Salvando resultados parciais...')
+                        data[0]['crawler_retrieved_track_ids'] = requested_ids
+                        save_json(data, os.path.join(args.out_dir, 'playlist_{}_partial.json'.format(playlist_id)))
+            else:
+                tracks = None
 
+    except KeyboardInterrupt:
+        if args.verbose:
+            print('Salvando resultados parciais...')
+        data[0]['crawler_retrieved_track_ids'] = requested_ids
+        save_json(data, os.path.join(args.out_dir, 'playlist_{}_partial.json'.format(playlist_id)))
+        raise
+
+    if os.path.isfile(os.path.join(args.in_dir, 'playlist_{}_partial.json'.format(playlist_id))):
+        os.remove(os.path.join(args.in_dir, 'playlist_{}_partial.json'.format(playlist_id)))
+
+    data[0]['crawler_retrieved_track_ids'] = requested_ids
     return data
 
 
@@ -177,53 +196,67 @@ def get_album_tracks(album_ids, set_name):
             print('Resultados parciais encontrados, recarregando...')
         data = load_json(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name)))
         requested_ids = data[0].pop('crawler_retrieved_album_ids', None)
+    else:
+        data.insert(0, {'crawler_retrieved_album_ids': requested_ids})
 
-    for id in album_ids:
-        if id in requested_ids:
-            continue
+    try:
+        for album_id in album_ids:
+            if album_id in requested_ids:
+                continue
 
-        while True:
-            try:
-                check_request_limits()
-                album = sp.album_tracks(id, limit=50)
-                break;
+            while True:
+                try:
+                    check_request_limits()
+                    album = sp.album_tracks(album_id, limit=50)
+                    break
 
-            except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                print('Falha ao acessar API do Spotify, recarregando instância')
-                reload_api(failed=True)
+                except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                    print('Falha ao acessar API do Spotify, recarregando instância')
+                    reload_api(failed=True)
 
-        tracks = album['items']
+            tracks = album['items']
 
-        while True:
-            for item in tracks:
-                data.append(item)
-
-            if album['next']:
-                while True:
+            while True:
+                for track in tracks:
                     try:
-                        check_request_limits()
-                        tracks = sp.next(album)
-                        break;
+                        if not any(element.get('id') == track['id'] for element in data):
+                            data.append(track)
+                    except TypeError:
+                        # Workaround para possível bug no Spotipy (testado pela última vez na versão 2.23.0)
+                        # Exceção ocorre em álbuns com mais de 50 faixas (ID de exemplo: 3myPwaMYjdwhtq0nFgeG6W)
+                        album['next'] = tracks['next']
+                        tracks = tracks['items']
+                        for track in tracks:
+                            if not any(element.get('id') == track['id'] for element in data):
+                                data.append(track)
+                        break
 
-                    except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                        print('Falha ao acessar API do Spotify, recarregando instância')
-                        reload_api(failed=True)
+                if album['next']:
+                    while True:
+                        try:
+                            check_request_limits()
+                            tracks = sp.next(album)
+                            break
 
-                        if args.verbose:
-                            print('Salvando resultados parciais...')
-                        data[0]['crawler_retrieved_album_ids'] = requested_ids
-                        save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(set_name)))
+                        except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                            print('Falha ao acessar API do Spotify, recarregando instância')
+                            reload_api(failed=True)
 
-                    except KeyboardInterrupt:
-                        if args.verbose:
-                            print('Salvando resultados parciais...')
-                        data[0]['crawler_retrieved_album_ids'] = requested_ids
-                        save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(set_name)))
-                        raise
+                            if args.verbose:
+                                print('Salvando resultados parciais...')
+                            data[0]['crawler_retrieved_album_ids'] = requested_ids
+                            save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(set_name)))
 
-            else:
-                break
-        requested_ids.append(id)
+                else:
+                    break
+            requested_ids.append(album_id)
+
+    except KeyboardInterrupt:
+        if args.verbose:
+            print('Salvando resultados parciais...')
+        data[0]['crawler_retrieved_album_ids'] = requested_ids
+        save_json(data, os.path.join(args.out_dir, 'album_tracks_{}_partial.json'.format(set_name)))
+        raise
 
     if os.path.isfile(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name))):
         os.remove(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name)))
@@ -248,38 +281,39 @@ def get_features(track_ids, set_name):
             if item['id'] in track_ids:
                 track_ids.remove(item['id'])
 
-    if len(track_ids) > 100:
-        for i in range(0, len(track_ids), 100):
+    try:
+        if len(track_ids) > 100:
+            for i in range(0, len(track_ids), 100):
+                while True:
+                    try:
+                        check_request_limits()
+                        data.extend(sp.audio_features(track_ids[i:i+100]))
+                        break
+
+                    except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                        print('Falha ao acessar API do Spotify, recarregando instância')
+                        reload_api(failed=True)
+
+                        if args.verbose:
+                            print('Salvando resultados parciais...')
+                        save_json(data, os.path.join(args.out_dir, 'features_{}_partial.json'.format(set_name)))
+
+        else:
             while True:
                 try:
                     check_request_limits()
-                    data.extend(sp.audio_features(track_ids[i:i+100]))
-                    break;
+                    data.extend(sp.audio_features(track_ids))
+                    break
 
                 except (ReadTimeout, spotipy.exceptions.SpotifyException):
                     print('Falha ao acessar API do Spotify, recarregando instância')
                     reload_api(failed=True)
 
-                    if args.verbose:
-                        print('Salvando resultados parciais...')
-                    save_json(data, os.path.join(args.out_dir, 'features_{}_partial.json'.format(set_name)))
-
-                except KeyboardInterrupt:
-                    if args.verbose:
-                        print('Salvando resultados parciais...')
-                    save_json(data, os.path.join(args.out_dir, 'features_{}_partial.json'.format(set_name)))
-                    raise
-
-    else:
-        while True:
-            try:
-                check_request_limits()
-                data.extend(sp.audio_features(track_ids))
-                break;
-
-            except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                print('Falha ao acessar API do Spotify, recarregando instância')
-                reload_api(failed=True)
+    except KeyboardInterrupt:
+        if args.verbose:
+            print('Salvando resultados parciais...')
+        save_json(data, os.path.join(args.out_dir, 'features_{}_partial.json'.format(set_name)))
+        raise
 
     if os.path.isfile(os.path.join(args.in_dir, 'features_{}_partial.json'.format(set_name))):
         os.remove(os.path.join(args.in_dir, 'features_{}_partial.json'.format(set_name)))
@@ -290,7 +324,7 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.2]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.3]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -322,7 +356,7 @@ if args.split_json:
     part = 0
 
     for i in range(0, len(data), size):
-        slice_name = '{}{:06d}.json'.format(re.sub('\\.[jJ][sS][oO][nN]', '', args.split_json[0]), part)
+        slice_name = '{}{:06d}.json'.format(re.sub('\\.[jJ][sS][oO][nN]$', '', args.split_json[0]), part)
         save_json(data[i:i+size], os.path.join(args.out_dir, slice_name))
         part += 1
 
@@ -370,14 +404,14 @@ if args.get_playlists:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
 
-        for playlist, id in source.items():
+        for playlist_name, playlist_id in source.items():
             if args.verbose:
-                print('Obtendo faixas da playlist "{}"...'.format(playlist))
-            data = get_playlist(id)
+                print('Obtendo faixas da playlist "{}"...'.format(playlist_name))
+            data = get_playlist(playlist_id)
 
-            save_json(data, os.path.join(args.out_dir, 'playlist_{}.json'.format(playlist)))
+            save_json(data, os.path.join(args.out_dir, 'playlist_{}.json'.format(playlist_name)))
             if args.verbose:
-                print('{} faixas salvas em playlist_{}.json'.format(len(data), playlist))
+                print('{} faixas salvas em playlist_{}.json'.format(len(data)-1, playlist_name))
 
 # Processamento da opção --get-album-tracks (-d)
 if args.get_album_tracks:
@@ -391,11 +425,11 @@ if args.get_album_tracks:
         if len(data):
             if args.verbose:
                 print('Obtendo faixas de {} álbuns encontrados em "{}"...'.format(len(data), file))
-            album_tracks = get_album_tracks(data, re.sub('\\.[jJ][sS][oO][nN]', '', file))
+            album_tracks = get_album_tracks(data, re.sub('\\.[jJ][sS][oO][nN]$', '', file))
 
             save_json(album_tracks, os.path.join(args.out_dir, 'album_tracks_{}'.format(file)))
             if args.verbose:
-                print('{} faixas de álbum salvas em album_tracks_{}'.format(len(album_tracks), file))
+                print('{} faixas de álbum salvas em album_tracks_{}'.format(len(album_tracks)-1, file))
 
 # Processamento da opção --get-features (-f)
 if args.get_features:
@@ -409,7 +443,7 @@ if args.get_features:
         if len(data):
             if args.verbose:
                 print('Obtendo recursos para {} faixas encontradas em "{}"...'.format(len(data), file))
-            features = get_features(data, re.sub('\\.[jJ][sS][oO][nN]', '', file))
+            features = get_features(data, re.sub('\\.[jJ][sS][oO][nN]$', '', file))
 
             save_json(features, os.path.join(args.out_dir, 'features_{}'.format(file)))
             if args.verbose:
