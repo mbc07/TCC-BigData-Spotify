@@ -138,7 +138,7 @@ def get_playlist(playlist_id):
                 break
 
             except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                print('Falha ao acessar API do Spotify, recarregando instância')
+                print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                 reload_api(failed=True)
 
         tracks = playlist['tracks']
@@ -159,7 +159,7 @@ def get_playlist(playlist_id):
                         break
 
                     except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                        print('Falha ao acessar API do Spotify, recarregando instância')
+                        print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                         reload_api(failed=True)
 
                         if args.verbose:
@@ -211,7 +211,7 @@ def get_album_tracks(album_ids, set_name):
                     break
 
                 except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                    print('Falha ao acessar API do Spotify, recarregando instância')
+                    print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                     reload_api(failed=True)
 
             tracks = album['items']
@@ -239,7 +239,7 @@ def get_album_tracks(album_ids, set_name):
                             break
 
                         except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                            print('Falha ao acessar API do Spotify, recarregando instância')
+                            print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                             reload_api(failed=True)
 
                             if args.verbose:
@@ -291,7 +291,7 @@ def get_features(track_ids, set_name):
                         break
 
                     except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                        print('Falha ao acessar API do Spotify, recarregando instância')
+                        print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                         reload_api(failed=True)
 
                         if args.verbose:
@@ -306,7 +306,7 @@ def get_features(track_ids, set_name):
                     break
 
                 except (ReadTimeout, spotipy.exceptions.SpotifyException):
-                    print('Falha ao acessar API do Spotify, recarregando instância')
+                    print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
                     reload_api(failed=True)
 
     except KeyboardInterrupt:
@@ -324,7 +324,7 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.3]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.4]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -360,8 +360,7 @@ if args.split_json:
         save_json(data[i:i+size], os.path.join(args.out_dir, slice_name))
         part += 1
 
-    if args.verbose:
-        print('{} dividido em {} JSONs com {} ou menos elementos'.format(args.split_json[0], part, size))
+    print('{} dividido em {} JSONs com {} ou menos elementos'.format(args.split_json[0], part, size))
     sys.exit()
 
 # Processamento da opção --merge-json (-m)
@@ -379,8 +378,7 @@ if args.merge_json:
     else:
         raise RuntimeError('Nenhum JSON com prefixo "{}" foi encontrado em "{}", verifique a sintaxe e tente novamente'.format(args.merge_json[0], args.in_dir))
 
-    if args.verbose:
-        print('{} elementos contidos em {} JSONs foram mesclados em {}'.format(len(data), slices, args.merge_json[1]))
+    print('{} elementos contidos em {} JSONs foram mesclados em {}'.format(len(data), slices, args.merge_json[1]))
     sys.exit()
 
 # Processamento da opção --job-file (-j)
@@ -410,8 +408,7 @@ if args.get_playlists:
             data = get_playlist(playlist_id)
 
             save_json(data, os.path.join(args.out_dir, 'playlist_{}.json'.format(playlist_name)))
-            if args.verbose:
-                print('{} faixas salvas em playlist_{}.json'.format(len(data)-1, playlist_name))
+            print('{} faixas salvas em playlist_{}.json'.format(len(data)-1, playlist_name))
 
 # Processamento da opção --get-album-tracks (-d)
 if args.get_album_tracks:
@@ -419,7 +416,7 @@ if args.get_album_tracks:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
         for item in source:
-            if item['album']['type'] == 'album':
+            if item.get('album').get('type') == 'album':
                 data.append(item['album']['id'])
 
         if len(data):
@@ -428,8 +425,7 @@ if args.get_album_tracks:
             album_tracks = get_album_tracks(data, re.sub('\\.[jJ][sS][oO][nN]$', '', file))
 
             save_json(album_tracks, os.path.join(args.out_dir, 'album_tracks_{}'.format(file)))
-            if args.verbose:
-                print('{} faixas de álbum salvas em album_tracks_{}'.format(len(album_tracks)-1, file))
+            print('{} faixas de álbum salvas em album_tracks_{}'.format(len(album_tracks)-1, file))
 
 # Processamento da opção --get-features (-f)
 if args.get_features:
@@ -437,7 +433,7 @@ if args.get_features:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
         for item in source:
-            if item['type'] == 'track':
+            if item.get('type') == 'track':
                 data.append(item['id'])
 
         if len(data):
@@ -446,5 +442,4 @@ if args.get_features:
             features = get_features(data, re.sub('\\.[jJ][sS][oO][nN]$', '', file))
 
             save_json(features, os.path.join(args.out_dir, 'features_{}'.format(file)))
-            if args.verbose:
-                print('Recursos de {} faixas salvas em features_{}'.format(len(features), file))
+            print('Recursos de {} faixas salvas em features_{}'.format(len(features), file))
