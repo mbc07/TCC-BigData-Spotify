@@ -220,6 +220,7 @@ def get_album_tracks(album_ids, set_name):
                 for track in tracks:
                     try:
                         if not any(element.get('id') == track['id'] for element in data):
+                            track['crawler_album_id'] = album_id
                             data.append(track)
                     except TypeError:
                         # Workaround para possível bug no Spotipy (testado pela última vez na versão 2.23.0)
@@ -228,6 +229,7 @@ def get_album_tracks(album_ids, set_name):
                         tracks = tracks['items']
                         for track in tracks:
                             if not any(element.get('id') == track['id'] for element in data):
+                                track['crawler_album_id'] = album_id
                                 data.append(track)
                         break
 
@@ -262,6 +264,66 @@ def get_album_tracks(album_ids, set_name):
         os.remove(os.path.join(args.in_dir, 'album_tracks_{}_partial.json'.format(set_name)))
 
     data[0]['crawler_retrieved_album_ids'] = requested_ids
+    return data
+
+
+# Obtém informações de álbum de todas as IDs especificadas
+def get_albums(album_ids, set_name):
+    if not 'sp' in globals():
+        reload_api()
+
+    data = []
+
+    if os.path.isfile(os.path.join(args.in_dir, 'albums_{}_partial.json'.format(set_name))):
+        if args.verbose:
+            print('Resultados parciais encontrados, recarregando...')
+        data = load_json(os.path.join(args.in_dir, 'albums_{}_partial.json'.format(set_name)))
+
+        for item in data:
+            if item['id'] in album_ids:
+                album_ids.remove(item['id'])
+
+    try:
+        if len(album_ids) > 20:
+            for i in range(0, len(album_ids), 20):
+                while True:
+                    try:
+                        check_request_limits()
+                        albums = sp.albums(album_ids[i:i+20])
+                        for album in albums['albums']:
+                            data.append(album)
+                        break
+
+                    except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                        print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
+                        reload_api(failed=True)
+
+                        if args.verbose:
+                            print('Salvando resultados parciais...')
+                        save_json(data, os.path.join(args.out_dir, 'albums_{}_partial.json'.format(set_name)))
+
+        else:
+            while True:
+                try:
+                    check_request_limits()
+                    albums = sp.albums(album_ids)
+                    for album in albums['albums']:
+                        data.append(album)
+                    break
+
+                except (ReadTimeout, spotipy.exceptions.SpotifyException):
+                    print('Falha ao acessar API do Spotify, recarregando instância [{}/{}]'.format(current_client+1, len(clients)))
+                    reload_api(failed=True)
+
+    except KeyboardInterrupt:
+        if args.verbose:
+            print('Salvando resultados parciais...')
+        save_json(data, os.path.join(args.out_dir, 'albums_{}_partial.json'.format(set_name)))
+        raise
+
+    if os.path.isfile(os.path.join(args.in_dir, 'albums_{}_partial.json'.format(set_name))):
+        os.remove(os.path.join(args.in_dir, 'albums_{}_partial.json'.format(set_name)))
+
     return data
 
 
@@ -324,7 +386,7 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v0.9.4]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.0]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -335,6 +397,7 @@ parser.add_argument('-s', '--split-json', action='extend', nargs=2, metavar=('FI
 parser.add_argument('-m', '--merge-json', action='extend', nargs=2, metavar=('PREFIX', 'FILE'), help='mescla arquivos menores, com nomes iniciados em PREFIX, em um arquivo único especificado por FILE')
 
 parser.add_argument('-p', '--get-playlists', nargs='+', metavar=('FILE'), help='obtém todas as faixas contidas na(s) playlist(s) listada(s) no(s) arquivo(s) especificado(s)')
+parser.add_argument('-a', '--get-albums', nargs='+', metavar=('FILE'), help='obtém informações de álbuns contidos no(s) arquivo(s) especificado(s)')
 parser.add_argument('-d', '--get-album-tracks', nargs='+', metavar=('FILE'), help='obtém todas as faixas contidas no(s) álbum(ns) listado(s) no(s) arquivo(s) especificado(s)')
 parser.add_argument('-f', '--get-features', nargs='+', metavar=('FILE'), help='obtém todas os recursos das faixas contidas no(s) arquivo(s) especificado(s)')
 
@@ -344,6 +407,10 @@ parser.add_argument('-t', '--refresh-tokens', default=False, action='store_true'
 parser.add_argument('-v', '--verbose', default=False, action='store_true', help='mostra mensagens de status e depuração durante a execução das tarefas')
 
 args = parser.parse_args()
+
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
 
 # Normaliza caminhos de pasta passados pela linha de comando
 args.in_dir = os.path.abspath(args.in_dir)
@@ -361,7 +428,7 @@ if args.split_json:
         part += 1
 
     print('{} dividido em {} JSONs com {} ou menos elementos'.format(args.split_json[0], part, size))
-    sys.exit()
+    sys.exit(0)
 
 # Processamento da opção --merge-json (-m)
 if args.merge_json:
@@ -379,12 +446,12 @@ if args.merge_json:
         raise RuntimeError('Nenhum JSON com prefixo "{}" foi encontrado em "{}", verifique a sintaxe e tente novamente'.format(args.merge_json[0], args.in_dir))
 
     print('{} elementos contidos em {} JSONs foram mesclados em {}'.format(len(data), slices, args.merge_json[1]))
-    sys.exit()
+    sys.exit(0)
 
 # Processamento da opção --job-file (-j)
 if args.job_file:
     print("Função não implementada")
-    sys.exit()
+    sys.exit(1)
 
 # Processamento da opção --refresh-tokens (-t)
 if args.refresh_tokens:
@@ -409,6 +476,30 @@ if args.get_playlists:
 
             save_json(data, os.path.join(args.out_dir, 'playlist_{}.json'.format(playlist_name)))
             print('{} faixas salvas em playlist_{}.json'.format(len(data)-1, playlist_name))
+
+# Processamento da opção --get-albums (-a)
+if args.get_albums:
+    for file in args.get_albums:
+        source = load_json(os.path.join(args.in_dir, file))
+        data = []
+        for item in source:
+            if item.get('crawler_retrieved_album_ids'):
+                for album_id in item['crawler_retrieved_album_ids']:
+                    if not album_id in data:
+                        data.append(album_id)
+                break
+
+            elif item.get('album').get('type') == 'album':
+                if not item['album']['id'] in data:
+                    data.append(item['album']['id'])
+
+        if len(data):
+            if args.verbose:
+                print('Obtendo informações de {} álbuns encontrados em "{}"...'.format(len(data), file))
+            albums = get_albums(data, re.sub('\\.[jJ][sS][oO][nN]$', '', file))
+
+            save_json(albums, os.path.join(args.out_dir, 'albums_{}'.format(file)))
+            print('{} álbuns salvos em albums_{}'.format(len(albums), file))
 
 # Processamento da opção --get-album-tracks (-d)
 if args.get_album_tracks:
