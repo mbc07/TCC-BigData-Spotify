@@ -386,7 +386,7 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.0]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -483,7 +483,10 @@ if args.get_albums:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
         for item in source:
-            if item.get('crawler_retrieved_album_ids'):
+            if item.get('crawler_retrieved_track_ids'):
+                continue
+
+            elif item.get('crawler_retrieved_album_ids'):
                 for album_id in item['crawler_retrieved_album_ids']:
                     if not album_id in data:
                         data.append(album_id)
@@ -507,8 +510,8 @@ if args.get_album_tracks:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
         for item in source:
-            if item.get('album').get('type') == 'album':
-                data.append(item['album']['id'])
+            if item.get('type') == 'album':
+                data.append(item['id'])
 
         if len(data):
             if args.verbose:
