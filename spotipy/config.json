@@ -1,0 +1,106 @@
+[
+    {
+        "input_file": "unpacked-data-files/df_playlist.json",
+        "output_file": "output-merge-files/df_tracks.json",
+        "select_columns": ["id", "name", "album_id", "artists_ids", "images_ids", "genre", "explicit", "duration_ms", "popularity"],
+        "rename_columns": {
+            "id": "track_id",
+            "name": "track_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/df_album_tracks_playlist.json",
+        "output_file": "output-merge-files/df_tracks.json",
+        "select_columns": ["id", "name", "crawler_album_id", "artists_ids", "explicit", "duration_ms"],
+        "rename_columns": {
+            "id": "track_id",
+            "name": "track_name",
+            "crawler_album_id": "album_id"
+        },
+        "join_config": {
+            "input_file": "unpacked-data-files/df_album_playlist.json",
+            "select_columns": ["id", "images_ids", "popularity"],
+            "on": "album_id",
+            "rename_join_columns": {
+                "id": "album_id"
+            }
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/df_features_playlist.json",
+        "output_file": "output-merge-files/df_tracks_features.json",
+        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"],
+        "rename_columns": {
+            "id": "track_id"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/df_features_album_tracks_playlist.json",
+        "output_file": "output-merge-files/df_tracks_features.json",
+        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"],
+        "rename_columns": {
+            "id": "track_id"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/df_album_playlist.json",
+        "output_file": "output-merge-files/df_album.json",
+        "select_columns": ["id", "name", "release_date"],
+        "rename_columns": {
+            "id": "album_id",
+            "name": "album_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/playlist_album.json",
+        "output_file": "output-merge-files/df_album.json",
+        "select_columns": ["id", "name", "release_date"],
+        "rename_columns": {
+            "id": "album_id",
+            "name": "album_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/album_playlist_artists.json",
+        "output_file": "output-merge-files/df_artists.json",
+        "select_columns": ["id", "name"],
+        "rename_columns": {
+            "id": "artist_id",
+            "name": "artist_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/album_tracks_playlist_artists.json",
+        "output_file": "output-merge-files/df_artists.json",
+        "select_columns": ["id", "name"],
+        "rename_columns": {
+            "id": "artist_id",
+            "name": "artist_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/playlist_artists.json",
+        "output_file": "output-merge-files/df_artists.json",
+        "select_columns": ["id", "name"],
+        "rename_columns": {
+            "id": "artist_id",
+            "name": "artist_name"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/album_playlist_images.json",
+        "output_file": "output-merge-files/df_images.json",
+        "select_columns": ["id", "height", "width"],
+        "rename_columns": {
+            "id": "image_id"
+        }
+    },
+    {
+        "input_file": "unpacked-data-files/playlist_images.json",
+        "output_file": "output-merge-files/df_images.json",
+        "select_columns": ["id", "height", "width"],
+        "rename_columns": {
+            "id": "image_id"
+        }
+    }
+]
