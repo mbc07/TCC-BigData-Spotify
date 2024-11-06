@@ -386,12 +386,11 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.2]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
 parser.add_argument('-o', '--out-dir', metavar=('DIR'), default='.', help='local onde o(s) arquivo(s) gerado(s) serão salvos (padrão: pasta atual)')
-parser.add_argument('-j', '--job-file', metavar=('FILE'), help='especifica um arquivo descrevendo tarefas a serem executadas de maneira autônoma')
 
 parser.add_argument('-s', '--split-json', action='extend', nargs=2, metavar=('FILE', 'N'), help='divide o arquivo informado em arquivos menores, contendo até N itens em cada um')
 parser.add_argument('-m', '--merge-json', action='extend', nargs=2, metavar=('PREFIX', 'FILE'), help='mescla arquivos menores, com nomes iniciados em PREFIX, em um arquivo único especificado por FILE')
@@ -448,11 +447,6 @@ if args.merge_json:
     print('{} elementos contidos em {} JSONs foram mesclados em {}'.format(len(data), slices, args.merge_json[1]))
     sys.exit(0)
 
-# Processamento da opção --job-file (-j)
-if args.job_file:
-    print("Função não implementada")
-    sys.exit(1)
-
 # Processamento da opção --refresh-tokens (-t)
 if args.refresh_tokens:
     reload_credentials()
@@ -486,7 +480,7 @@ if args.get_albums:
             if item.get('crawler_retrieved_track_ids'):
                 continue
 
-            elif item.get('crawler_retrieved_album_ids'):
+            if item.get('crawler_retrieved_album_ids'):
                 for album_id in item['crawler_retrieved_album_ids']:
                     if not album_id in data:
                         data.append(album_id)
@@ -510,8 +504,11 @@ if args.get_album_tracks:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
         for item in source:
-            if item.get('type') == 'album':
-                data.append(item['id'])
+            if item.get('crawler_retrieved_track_ids'):
+                continue
+
+            if item.get('album').get('type') == 'album':
+                data.append(item['album']['id'])
 
         if len(data):
             if args.verbose:
