@@ -90,7 +90,7 @@
     {
         "input_file": "unpacked-data-files/album_playlist_images.json",
         "output_file": "output-merge-files/df_images.json",
-        "select_columns": ["id", "height", "width"],
+        "select_columns": ["id", "height", "width", "url"],
         "rename_columns": {
             "id": "image_id"
         }
@@ -98,7 +98,7 @@
     {
         "input_file": "unpacked-data-files/playlist_images.json",
         "output_file": "output-merge-files/df_images.json",
-        "select_columns": ["id", "height", "width"],
+        "select_columns": ["id", "height", "width", "url"],
         "rename_columns": {
             "id": "image_id"
         }

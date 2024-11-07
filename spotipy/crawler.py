@@ -386,7 +386,7 @@ def get_features(track_ids, set_name):
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.2]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='SpotifyCrawler [v1.2.1]', epilog='Conjunto de ferramentas para extração de dados utilizando a Web API do Spotify. Todos os arquivos de entrada/saída utilizam o formato JSON.')
 
 # To Do: quebrar em subparsers mais organizados
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
@@ -407,10 +407,6 @@ parser.add_argument('-v', '--verbose', default=False, action='store_true', help=
 
 args = parser.parse_args()
 
-if len(sys.argv) == 1:
-    parser.print_help()
-    sys.exit(1)
-
 # Normaliza caminhos de pasta passados pela linha de comando
 args.in_dir = os.path.abspath(args.in_dir)
 args.out_dir = os.path.abspath(args.out_dir)
@@ -430,7 +426,7 @@ if args.split_json:
     sys.exit(0)
 
 # Processamento da opção --merge-json (-m)
-if args.merge_json:
+elif args.merge_json:
     data = []
     slices = 0
 
@@ -448,7 +444,7 @@ if args.merge_json:
     sys.exit(0)
 
 # Processamento da opção --refresh-tokens (-t)
-if args.refresh_tokens:
+elif args.refresh_tokens:
     reload_credentials()
     if args.verbose:
         print('Validando tokens de {} credenciais...'.format(len(clients)))
@@ -458,7 +454,7 @@ if args.refresh_tokens:
         reload_api()
 
 # Processamento da opção --get-playlists (-p)
-if args.get_playlists:
+elif args.get_playlists:
     for file in args.get_playlists:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
@@ -472,7 +468,7 @@ if args.get_playlists:
             print('{} faixas salvas em playlist_{}.json'.format(len(data)-1, playlist_name))
 
 # Processamento da opção --get-albums (-a)
-if args.get_albums:
+elif args.get_albums:
     for file in args.get_albums:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
@@ -499,7 +495,7 @@ if args.get_albums:
             print('{} álbuns salvos em albums_{}'.format(len(albums), file))
 
 # Processamento da opção --get-album-tracks (-d)
-if args.get_album_tracks:
+elif args.get_album_tracks:
     for file in args.get_album_tracks:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
@@ -519,7 +515,7 @@ if args.get_album_tracks:
             print('{} faixas de álbum salvas em album_tracks_{}'.format(len(album_tracks)-1, file))
 
 # Processamento da opção --get-features (-f)
-if args.get_features:
+elif args.get_features:
     for file in args.get_features:
         source = load_json(os.path.join(args.in_dir, file))
         data = []
@@ -534,3 +530,7 @@ if args.get_features:
 
             save_json(features, os.path.join(args.out_dir, 'features_{}'.format(file)))
             print('Recursos de {} faixas salvas em features_{}'.format(len(features), file))
+
+else:
+    parser.print_help()
+    sys.exit(1)
