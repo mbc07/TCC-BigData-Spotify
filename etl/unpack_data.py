@@ -28,19 +28,20 @@ def get_prefix(file_name):
     else:
         return None
 
-# Função para gerar um ID único usando hash MD5
+# Função para gerar um ID único usando hash SHA256
 def generate_id(value):
-    return hashlib.md5(str(value).encode()).hexdigest()
+    return hashlib.sha256(str(value).encode()).hexdigest()
 
 # Função para carregar dados de um arquivo JSON e remover um campo específico
 def data_from_json(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
     
-    # Remover campo 'crawler_retrieved_album_ids' se existir
+    # Remover campos 'crawler_retrieved_album_ids' e 'crawler_retrieved_album_ids' se existirem
     for item in data:
         if item is not None:
             item.pop('crawler_retrieved_album_ids', None)
+            item.pop('crawler_retrieved_track_ids', None)
 
     return data
 

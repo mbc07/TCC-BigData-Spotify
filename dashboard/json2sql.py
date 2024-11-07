@@ -17,29 +17,58 @@ def save_sql(data, path):
 
 def json_to_sql(data, table_name):
     sql_commands = []
-    
-    # Verifica se o arquivo JSON contém uma lista de dicionários
-    if isinstance(data, list) and all(isinstance(item, dict) for item in data):
-        # Obtemos as colunas da tabela com base na primeira tupla (chave do dicionário)
-        columns = data[0].keys()
+    has_date_column = False
 
+    if isinstance(data, list) and all(isinstance(item, dict) for item in data):
+        columns = data[0].keys()
+        
         if args.verbose:
             print("Processando {} colunas de {} itens...".format(len(columns), len(data)))
-        
+
         for item in data:
-            # Prepara os valores para o comando SQL
-            values = [f"'{str(value).replace("'", "''")}'" if value is not None else "NULL" for value in item.values()]
-            # Monta o comando SQL INSERT
+            values = []
+            for key, value in item.items():
+                if value is None:
+                    values.append("NULL")
+                elif key == 'release_date':
+                    has_date_column = True
+                    values.append(f"normalize_date('{str(value).replace("'", "''")}')")
+                else:
+                    values.append(f"'{str(value).replace("'", "''")}'")
+            
             sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(values)});"
             sql_commands.append(sql)
     
-    return sql_commands
+    if has_date_column:
+        if args.verbose:
+            print("Coluna de tipo DATE detectada, adicionando função normalize_date() no SQL...")
+            
+        sql_normalize_date = []
+        sql_normalize_date.append("CREATE OR REPLACE FUNCTION normalize_date(partial_date TEXT)")
+        sql_normalize_date.append("RETURNS DATE AS $$")
+        sql_normalize_date.append("BEGIN")
+        sql_normalize_date.append("    IF LENGTH(partial_date) = 7 THEN")
+        sql_normalize_date.append("        RETURN TO_DATE(partial_date || '-01', 'YYYY-MM-DD');")
+        sql_normalize_date.append("    ELSIF LENGTH(partial_date) = 4 THEN")
+        sql_normalize_date.append("        RETURN TO_DATE(partial_date || '-01-01', 'YYYY-MM-DD');")
+        sql_normalize_date.append("    ELSE")
+        sql_normalize_date.append("        RETURN TO_DATE(partial_date, 'YYYY-MM-DD');")
+        sql_normalize_date.append("    END IF;")
+        sql_normalize_date.append("END;")
+        sql_normalize_date.append("$$ LANGUAGE plpgsql;")
+        sql_normalize_date.append("")
+        
+        sql_normalize_date.extend(sql_commands)
+        return sql_normalize_date
+        
+    else:
+        return sql_commands
 
 
 #==================================================================================================
 #----------------------------------- PROGRAMA PRINCIPAL (MAIN) ------------------------------------
 
-parser = argparse.ArgumentParser(allow_abbrev=False, description='Json2Sql [v1.0]', epilog='Converte dados de arquivos JSON em comandos SQL')
+parser = argparse.ArgumentParser(allow_abbrev=False, description='Json2Sql [v1.1]', epilog='Converte dados de arquivos JSON em comandos SQL')
 
 parser.add_argument('-i', '--in-dir', metavar=('DIR'), default='.', help='local contendo o(s) arquivo(s) a serem processados (padrão: pasta atual)')
 parser.add_argument('-o', '--out-dir', metavar=('DIR'), default='.', help='local onde o(s) arquivo(s) gerado(s) serão salvos (padrão: pasta atual)')
