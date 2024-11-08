@@ -29,7 +29,7 @@
     {
         "input_file": "unpacked-data-files/df_features_playlist.json",
         "output_file": "output-merge-files/df_tracks_features.json",
-        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"],
+        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence", "tempo", "time_signature"],
         "rename_columns": {
             "id": "track_id"
         }
@@ -37,7 +37,7 @@
     {
         "input_file": "unpacked-data-files/df_features_album_tracks_playlist.json",
         "output_file": "output-merge-files/df_tracks_features.json",
-        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"],
+        "select_columns": ["id","danceability", "energy", "key", "loudness", "mode", "speechiness", "acousticness", "instrumentalness", "liveness", "valence", "tempo", "time_signature"],
         "rename_columns": {
             "id": "track_id"
         }
