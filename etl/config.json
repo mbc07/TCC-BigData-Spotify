@@ -11,7 +11,7 @@
     {
         "input_file": "unpacked-data-files/df_album_tracks_playlist.json",
         "output_file": "output-merge-files/df_tracks.json",
-        "select_columns": ["id", "name", "crawler_album_id", "artists_ids", "explicit", "duration_ms"],
+        "select_columns": ["id", "name", "crawler_album_id", "artists_ids", "genre", "explicit", "duration_ms"],
         "rename_columns": {
             "id": "track_id",
             "name": "track_name",
