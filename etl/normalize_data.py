@@ -42,6 +42,9 @@ df_tracks = df_tracks.drop_duplicates()
 df_artist_track = df_tracks[['track_id', 'artist_id']].drop_duplicates().reset_index(drop=True)
 df_image_track = df_tracks[['track_id', 'image_id']].drop_duplicates().reset_index(drop=True)
 
+# Remove as colunas de id: artist_id e image_id
+df_tracks = df_tracks.drop(columns=['artist_id', 'image_id'])
+
 # Salva os DataFrames no diretório de saída
 df_album.to_json(os.path.join(output_directory, 'df_album.json'), orient='records', lines=False)
 df_artists.to_json(os.path.join(output_directory, 'df_artists.json'), orient='records', lines=False)
