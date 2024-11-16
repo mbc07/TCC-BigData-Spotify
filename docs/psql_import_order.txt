@@ -1,8 +1,8 @@
 SET client_encoding TO 'UTF8';
 \i init_tables.sql
-\i df_artists.sql
-\i df_album.sql
-\i df_images.sql
-\i df_tracks.sql
-\i df_artist_track.sql
-\i df_image_track.sql
+\i pg_artists.sql
+\i pg_album.sql
+\i pg_images.sql
+\i pg_tracks.sql
+\i pg_artist_track.sql
+\i pg_image_track.sql
