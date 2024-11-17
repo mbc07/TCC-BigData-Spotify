@@ -2,7 +2,7 @@
     {
         "input_file": "unpacked-data-files/df_playlist.json",
         "output_file": "output-merge-files/df_tracks.json",
-        "select_columns": ["id", "name", "album_id", "artists_ids", "images_ids", "genre", "explicit", "duration_ms", "popularity"],
+        "select_columns": ["id", "name", "album_id", "artists_ids", "images_ids", "genre", "explicit", "duration_ms", "popularity", "preview_url"],
         "rename_columns": {
             "id": "track_id",
             "name": "track_name"
@@ -11,7 +11,7 @@
     {
         "input_file": "unpacked-data-files/df_album_tracks_playlist.json",
         "output_file": "output-merge-files/df_tracks.json",
-        "select_columns": ["id", "name", "crawler_album_id", "artists_ids", "genre", "explicit", "duration_ms"],
+        "select_columns": ["id", "name", "crawler_album_id", "artists_ids", "genre", "explicit", "duration_ms", "preview_url"],
         "rename_columns": {
             "id": "track_id",
             "name": "track_name",

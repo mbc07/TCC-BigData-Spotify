@@ -24,6 +24,7 @@ CREATE TABLE tracks (
     explicit BOOLEAN DEFAULT false,
     duration_ms INTEGER DEFAULT 0,
     popularity INTEGER DEFAULT 0,
+	preview_url TEXT DEFAULT ' ',
     danceability REAL DEFAULT 0,
     energy REAL DEFAULT 0,
     key INTEGER DEFAULT 0,
@@ -35,7 +36,7 @@ CREATE TABLE tracks (
     liveness REAL DEFAULT 0,
     valence REAL DEFAULT 0,
     tempo REAL DEFAULT 0,
-    time_signature INTEGER DEFAULT 0
+    time_signature INTEGER DEFAULT 0	
 );
 
 CREATE TABLE artist_track (
