@@ -36,7 +36,7 @@ CREATE TABLE tracks (
     liveness REAL DEFAULT 0,
     valence REAL DEFAULT 0,
     tempo REAL DEFAULT 0,
-    time_signature INTEGER DEFAULT 0	
+    time_signature INTEGER DEFAULT 0
 );
 
 CREATE TABLE artist_track (

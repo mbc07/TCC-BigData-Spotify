@@ -28,6 +28,18 @@
       "id": "grafana-postgresql-datasource",
       "name": "PostgreSQL",
       "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "marcusolsson-dynamictext-panel",
+      "name": "Business Text",
+      "version": "5.4.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
     }
   ],
   "annotations": {
@@ -52,6 +64,1770 @@
   "id": null,
   "links": [],
   "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 38,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking dos $top_rankings_limit artistas com maior média de dançabilidade no(s) gênero(s) selecionado(s). O painel também agrupa a música mais dançante de cada artista listado.\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 1
+          },
+          "id": 35,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"artist_name\">{{artist_name}}</p>\n  <div class=\"icon\" id=\"track_icon\"></div>\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#artist_name {  \r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover { \r\n  cursor: pointer; \r\n  text-decoration: underline;\r\n}\r\n\r\n#track_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M499.1 6.3c8.1 6 12.9 15.6 12.9 25.7l0 72 0 264c0 44.2-43 80-96 80s-96-35.8-96-80s43-80 96-80c11.2 0 22 1.6 32 4.6L448 147 192 223.8 192 432c0 44.2-43 80-96 80s-96-35.8-96-80s43-80 96-80c11.2 0 22 1.6 32 4.6L128 200l0-72c0-14.1 9.3-26.6 22.8-30.7l320-96c9.7-2.9 20.2-1.1 28.3 5z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "hide": true,
+              "rawQuery": true,
+              "rawSql": "WITH artist_feature_avg AS (\r\n  SELECT\r\n    at.artist_id,\r\n    AVG(t.danceability) AS avg_feature\r\n  FROM\r\n    artist_track at\r\n    JOIN tracks t ON at.track_id = t.track_id\r\n    JOIN artists ar ON at.artist_id = ar.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n  GROUP BY\r\n    at.artist_id\r\n),\r\ntop_artists AS (\r\n  SELECT\r\n    artist_id,\r\n    avg_feature\r\n  FROM\r\n    artist_feature_avg\r\n  ORDER BY\r\n    avg_feature DESC\r\n  LIMIT\r\n    $top_rankings_limit\r\n), artist_top_feature_track AS (\r\n  SELECT\r\n    t.danceability,\r\n    t.track_id,\r\n    at.artist_id,\r\n    ROW_NUMBER() OVER (\r\n      PARTITION BY at.artist_id\r\n      ORDER BY\r\n        t.danceability DESC\r\n    ) AS rn\r\n  FROM\r\n    tracks t\r\n    JOIN artist_track at ON t.track_id = at.track_id\r\n  WHERE\r\n    at.artist_id IN (\r\n      SELECT\r\n        artist_id\r\n      FROM\r\n        top_artists\r\n    )\r\n),\r\ntop_tracks_artists AS (\r\n  SELECT\r\n    atf.track_id\r\n  FROM\r\n    top_artists ta\r\n    JOIN artist_top_feature_track atf ON ta.artist_id = atf.artist_id\r\n  WHERE\r\n    atf.rn = 1\r\n)\r\nSELECT\r\n  t.track_id,\r\n  t.preview_url,\r\n  t.track_name,\r\n  a.album_name,\r\n  STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n  (\r\n    SELECT\r\n      i.url\r\n    FROM\r\n      image_track it\r\n      JOIN images i ON it.image_id = i.image_id\r\n    WHERE\r\n      it.track_id = t.track_id\r\n    ORDER BY\r\n      i.height DESC\r\n    LIMIT\r\n      1\r\n  ) AS image_url\r\nFROM\r\n  tracks t\r\n  JOIN album a ON t.album_id = a.album_id\r\n  JOIN artist_track at ON t.track_id = at.track_id\r\n  JOIN artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n  t.track_id IN (\r\n    SELECT\r\n      *\r\n    FROM\r\n      top_tracks_artists\r\n  )\r\nGROUP BY\r\n  t.track_id,\r\n  t.track_name,\r\n  a.album_name\r\nORDER BY\r\n  t.danceability",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "hide": false,
+              "rawQuery": true,
+              "rawSql": "WITH ArtistFeatureTop AS (\r\n  SELECT\r\n    a.artist_name,\r\n    at.track_id,\r\n    t.danceability,\r\n    ROW_NUMBER() OVER (\r\n      PARTITION BY a.artist_name\r\n      ORDER BY\r\n        t.danceability DESC\r\n    ) AS rank\r\n  FROM\r\n    artists a\r\n    JOIN artist_track at ON a.artist_id = at.artist_id\r\n    JOIN tracks t ON at.track_id = t.track_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nArtistFeatureAvg AS (\r\n  SELECT\r\n    a.artist_name,\r\n    AVG(t.danceability) AS feature\r\n  FROM\r\n    artists a\r\n    JOIN artist_track at ON a.artist_id = at.artist_id\r\n    JOIN tracks t ON at.track_id = t.track_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n  GROUP BY\r\n    a.artist_name\r\n),\r\nTopArtists AS (\r\n  SELECT\r\n    aft.artist_name,\r\n    aft.track_id,\r\n    afa.feature\r\n  FROM\r\n    ArtistFeatureTop aft\r\n    JOIN ArtistFeatureAvg afa ON aft.artist_name = afa.artist_name\r\n  WHERE\r\n    aft.rank = 1\r\n  ORDER BY\r\n    afa.feature DESC\r\n  LIMIT\r\n    $top_rankings_limit\r\n)\r\n\r\nSELECT\r\n  t.track_id,\r\n  t.preview_url,\r\n  t.track_name,\r\n  a.album_name,\r\n  ar.artist_name,\r\n  (\r\n    SELECT\r\n      i.url\r\n    FROM\r\n      image_track it\r\n      JOIN images i ON it.image_id = i.image_id\r\n    WHERE\r\n      it.track_id = t.track_id\r\n    ORDER BY\r\n      i.height DESC\r\n    LIMIT\r\n      1\r\n  ) AS image_url\r\nFROM\r\n  tracks t\r\n  JOIN album a ON t.album_id = a.album_id\r\n  JOIN artist_track at ON t.track_id = at.track_id\r\n  JOIN artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n  t.track_id IN (\r\n    SELECT\r\n      track_id\r\n    FROM\r\n      TopArtists\r\n  )\r\nGROUP BY\r\n  t.track_id,\r\n  t.track_name,\r\n  a.album_name,\r\n  ar.artist_name\r\nORDER BY\r\n  t.danceability DESC",
+              "refId": "B",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Artistas com músicas mais dançantes",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking dos $top_rankings_limit artistas com maior média de dançabilidade no(s) gênero(s) selecionado(s).",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 8,
+            "y": 1
+          },
+          "id": 37,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "enablePagination": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "frameIndex": 1,
+            "showHeader": false
+          },
+          "pluginVersion": "11.1.4",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "hide": false,
+              "rawQuery": true,
+              "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.danceability\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(danceability) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Artistas com músicas mais dançantes",
+          "type": "table"
+        }
+      ],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 16,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de dançabilidade no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 2
+          },
+          "id": 11,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>\n",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.danceability DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas mais dançantes",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de energia no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 2
+          },
+          "id": 17,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.energy DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas mais enérgicas",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de acusticidade no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 2
+          },
+          "id": 19,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.acousticness DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas mais acústicas",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de falabilidade no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 10
+          },
+          "id": 18,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.speechiness DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas com maior falabilidade",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de vivacidade no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 10
+          },
+          "id": 20,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.liveness DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas com maior vivacidade",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de instrumentabilidade no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 10
+          },
+          "id": 21,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.instrumentalness DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas mais instrumentais",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de valência no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 18
+          },
+          "id": 22,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.valence DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas com maior valência",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de volume geral no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 18
+          },
+          "id": 23,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.loudness DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas com maior volume geral",
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "description": "Ranking das $top_rankings_limit músicas com maior métrica de tempo musical no(s) gênero(s) selecionado(s).\n\nClique na capa do álbum para ampliar, ou no título da música para reproduzir/pausar uma prévia (se disponível).",
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 18
+          },
+          "id": 24,
+          "options": {
+            "afterRender": "openNewTab = (url) => {\r\n  window.open(url, '_blank');\r\n}\r\n\r\nplayOrPause = (audio_url) => {\r\n  player = document.getElementById('panel_preview_player');\r\n\r\n  if (player) {\r\n    if (player.src == audio_url) {\r\n      if (player.paused) {\r\n        player.play();\r\n      } else {\r\n        player.pause();\r\n      }\r\n    } else {\r\n      player.src = audio_url;\r\n      player.play();\r\n    }\r\n  } else {\r\n    player = document.createElement('audio');\r\n    player.setAttribute('id', 'panel_preview_player');\r\n    player.setAttribute('src', audio_url);\r\n    document.body.appendChild(player);\r\n    player.play();\r\n  }\r\n}\r\n",
+            "content": "<div class=\"cover\" style=\"background-image: url({{image_url}})\" onclick=\"openNewTab('{{image_url}}')\"></div>\n<div id=\"content\">\n  <p class=\"details\" id=\"track_name\" onclick=\"playOrPause('{{preview_url}}')\">{{track_name}}</p>\n  <div class=\"icon\" id=\"artist_icon\"></div>\n  <p class=\"details\" id=\"artists_name\">{{artist_names}}</p>\n  <div class=\"icon\" id=\"album_icon\"></div>\n  <p class=\"details\" id=\"album_name\">{{album_name}}</p>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "styles",
+              "afterRender"
+            ],
+            "externalStyles": [],
+            "helpers": "",
+            "renderMode": "everyRow",
+            "styles": ".dt-row {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.cover {\r\n  background-size: contain;\r\n  cursor: pointer;\r\n  float: left; \r\n  width: 66px; \r\n  height: 66px;\r\n  margin-right: 8px;\r\n}\r\n\r\n.icon {\r\n  float: left;\r\n  width: 1rem;\r\n  height: 1rem;\r\n  margin-top: 0.3rem;\r\n  margin-right: 4px;\r\n}\r\n\r\n.details {\r\n  font-size: 1rem;\r\n  margin: 0;\r\n  width: fit-content;\r\n  max-width: -moz-available;          /* WebKit-based browsers will ignore this. */\r\n  max-width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\r\n  max-width: fill-available;\r\n  max-width: stretch;\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n#track_name {\r\n  cursor: pointer;\r\n  font-weight: bold;\r\n}\r\n\r\n#track_name:hover {  \r\n  text-decoration: underline;\r\n}\r\n\r\n#artist_icon {\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><path d=\"M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}\r\n\r\n#album_icon{\r\n  filter: invert(81%) sepia(7%) saturate(376%) hue-rotate(201deg) brightness(104%) contrast(86%);\r\n  background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 224a128 128 0 1 0 0-256 128 128 0 1 0 0 256zm0-96a32 32 0 1 0 0-64 32 32 0 1 0 0 64z\"/></svg>');\r\n  background-repeat: no-repeat;\r\n  background-position: center; \r\n}",
+            "wrap": false
+          },
+          "pluginVersion": "5.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    t.track_id,\r\n    t.preview_url,\r\n    t.track_name, \r\n    a.album_name, \r\n    STRING_AGG(DISTINCT ar.artist_name, ', ') AS artist_names,\r\n    (\r\n        SELECT i.url\r\n        FROM image_track it\r\n        JOIN images i ON it.image_id = i.image_id\r\n        WHERE it.track_id = t.track_id\r\n        ORDER BY i.height DESC\r\n        LIMIT 1\r\n    ) AS image_url\r\nFROM \r\n    tracks t\r\nJOIN \r\n    album a ON t.album_id = a.album_id\r\nJOIN \r\n    artist_track at ON t.track_id = at.track_id\r\nJOIN \r\n    artists ar ON at.artist_id = ar.artist_id\r\nWHERE\r\n    t.genre IN ($ranking_genres)\r\nGROUP BY \r\n    t.track_id, t.track_name, a.album_name\r\nORDER BY \r\n    t.tempo DESC\r\nLIMIT $top_rankings_limit;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Músicas com maior tempo musical",
+          "type": "marcusolsson-dynamictext-panel"
+        }
+      ],
+      "title": "Rankings - Músicas",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 25,
+      "panels": [],
+      "title": "Rankings - Artistas",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de dançabilidade no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 3
+      },
+      "id": 36,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.danceability\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(danceability) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas mais dançantes",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de energia no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 3
+      },
+      "id": 27,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.energy\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(energy) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas mais enérgicas",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de acusticidade no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 3
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.acousticness\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(acousticness) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas mais acústicas",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de falabilidade no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      },
+      "id": 29,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.acousticness\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(acousticness) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas de maior falabilidade",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de vivacidade no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 9
+      },
+      "id": 30,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.liveness\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(liveness) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas de maior vivacidade",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de instrumentabilidade no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 9
+      },
+      "id": 31,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.instrumentalness\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(instrumentalness) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas mais instrumentais",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de valência no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 15
+      },
+      "id": 32,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.valence\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(valence) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas de maior valência",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de volume geral no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 15
+      },
+      "id": 33,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.loudness\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(loudness) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas de maior volume geral",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Ranking dos $top_rankings_limit artistas com maior média de tempo musical no(s) gênero(s) selecionado(s).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 15
+      },
+      "id": 34,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": false
+      },
+      "pluginVersion": "11.1.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH track_artist_feature AS (\r\n  SELECT \r\n    t.track_id,\r\n    at.artist_id,\r\n    a.artist_name,\r\n    t.tempo\r\n  FROM \r\n    tracks t\r\n  JOIN \r\n    artist_track at ON t.track_id = at.track_id\r\n  JOIN \r\n    artists a ON at.artist_id = a.artist_id\r\n  WHERE\r\n    t.genre IN ($ranking_genres)\r\n),\r\nartist_avg_feature AS (\r\n  SELECT \r\n    artist_name,\r\n    AVG(tempo) AS avg_feature\r\n  FROM \r\n    track_artist_feature\r\n  GROUP BY \r\n    artist_name\r\n)\r\nSELECT \r\n  artist_name\r\nFROM \r\n  artist_avg_feature\r\nORDER BY \r\n  avg_feature DESC\r\nLIMIT $top_rankings_limit;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Artistas com músicas de maior tempo musical",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Médias gerais",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
@@ -84,6 +1860,7 @@
               "mode": "off"
             }
           },
+          "decimals": 2,
           "mappings": [],
           "max": 1,
           "min": 0,
@@ -101,14 +1878,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
-        "y": 0
+        "y": 22
       },
       "id": 1,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -120,9 +1897,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -138,7 +1913,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(danceability) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(danceability) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -171,7 +1946,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -182,7 +1956,7 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
       "title": "Dançabilidade por gênero",
@@ -220,6 +1994,7 @@
               "mode": "off"
             }
           },
+          "decimals": 2,
           "mappings": [],
           "max": 1,
           "min": 0,
@@ -237,14 +2012,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
+        "w": 8,
+        "x": 8,
+        "y": 22
       },
       "id": 2,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -256,9 +2031,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -274,7 +2047,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(energy) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(energy) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -307,7 +2080,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -318,7 +2090,7 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
       "title": "Energia por gênero",
@@ -329,7 +2101,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
       },
-      "description": "A tonalidade em que a faixa está. Os números inteiros são mapeados para tons usando a notação padrão de classe de tom. \n\nPor exemplo 0 = C, 1 = C♯/D♭, 2 = D e assim por diante.",
+      "description": "Uma medida de confiança de 0.0 a 1.0 para saber se a faixa é acústica. \n\n1.0 representa alta confiança de que a faixa é acústica.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -356,9 +2128,9 @@
               "mode": "off"
             }
           },
-          "decimals": 0,
+          "decimals": 2,
           "mappings": [],
-          "max": 11,
+          "max": 1.1,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -374,14 +2146,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
+        "w": 8,
+        "x": 16,
+        "y": 22
       },
-      "id": 3,
+      "id": 7,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -393,9 +2165,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 24
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -411,7 +2181,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(key) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(acousticness) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -428,7 +2198,7 @@
                 "name": "AVG",
                 "parameters": [
                   {
-                    "name": "key",
+                    "name": "acousticness",
                     "type": "functionParameter"
                   }
                 ],
@@ -444,7 +2214,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -455,10 +2224,546 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
-      "title": "Tom por gênero",
+      "title": "Acusticidade por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Falabilidade detecta a presença de palavras faladas em uma faixa. Quanto mais exclusivamente falada for a gravação (por exemplo, talk show, audiolivro, poesia), mais próximo de 1.0 será o valor do atributo. Valores acima de 0.66 descrevem faixas que provavelmente são compostas inteiramente de palavras faladas. \n\nValores entre 0.33 e 0.66 descrevem faixas que podem conter música e fala, seja em seções ou em camadas, incluindo casos como música rap. Valores abaixo de 0.33 provavelmente representam música e outras faixas não faladas.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 30
+      },
+      "id": 6,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(speechiness) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "speechiness",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Falabilidade por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Detecta a presença de público na gravação. Valores mais altos de vivacidade representam uma probabilidade maior de que a faixa tenha sido tocada ao vivo. \n\nUm valor acima de 0.8 oferece forte probabilidade de que a faixa seja ao vivo.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 30
+      },
+      "id": 9,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(liveness) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "liveness",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Vivacidade por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Prevê se uma faixa não contém vocais. Os sons \"Ooh\" e \"aah\" são tratados como instrumentais neste contexto. Faixas de rap ou palavras faladas são claramente \"vocais\". Quanto mais próximo o valor da instrumentalidade estiver de 1.0, maior será a probabilidade de a faixa não conter conteúdo vocal. \n\nValores acima de 0.5 pretendem representar faixas instrumentais, mas a confiança é maior à medida que o valor se aproxima de 1.0.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 30
+      },
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(instrumentalness) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "instrumentalness",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Instrumentabilidade por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "Uma medida de 0.0 a 1.0 que descreve a positividade musical transmitida por uma faixa. \n\nFaixas com alta valência soam mais positivas (por exemplo, feliz, alegre, eufórica), enquanto faixas com baixa valência soam mais negativas (por exemplo, triste, deprimida, irritada).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 38
+      },
+      "id": 10,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(valence) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "valence",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Valência por gênero",
       "type": "barchart"
     },
     {
@@ -512,14 +2817,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
+        "w": 8,
+        "x": 8,
+        "y": 38
       },
       "id": 4,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -531,9 +2836,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 24
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -549,7 +2852,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(loudness) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(loudness) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -582,7 +2885,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -593,10 +2895,278 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
       "title": "Volume geral por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "O tempo estimado geral de uma faixa em batidas por minuto (BPM). \n\nNa terminologia musical, o tempo é a velocidade ou o ritmo de uma determinada peça e deriva diretamente da duração média da batida.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "fieldMinMax": false,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 38
+      },
+      "id": 13,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(tempo) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "tempo",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Tempo por gênero",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+      },
+      "description": "A tonalidade em que a faixa está. Os números inteiros são mapeados para tons usando a notação padrão de classe de tom. \n\nPor exemplo 0 = C, 1 = C♯/D♭, 2 = D e assim por diante.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "média",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 11,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 46
+      },
+      "id": 3,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT genre, AVG(key) FROM tracks GROUP BY genre ORDER BY genre ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "genre",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "key",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "genre",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "genre"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            }
+          },
+          "table": "tracks"
+        }
+      ],
+      "title": "Tom por gênero",
       "type": "barchart"
     },
     {
@@ -650,14 +3220,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
+        "w": 8,
+        "x": 8,
+        "y": 46
       },
       "id": 5,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -669,9 +3239,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 24
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -687,7 +3255,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(mode) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(mode) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -720,7 +3288,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -731,7 +3298,7 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
       "title": "Modo por gênero",
@@ -742,7 +3309,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
       },
-      "description": "Falabilidade detecta a presença de palavras faladas em uma faixa. Quanto mais exclusivamente falada for a gravação (por exemplo, talk show, audiolivro, poesia), mais próximo de 1.0 será o valor do atributo. Valores acima de 0.66 descrevem faixas que provavelmente são compostas inteiramente de palavras faladas. \n\nValores entre 0.33 e 0.66 descrevem faixas que podem conter música e fala, seja em seções ou em camadas, incluindo casos como música rap. Valores abaixo de 0.33 provavelmente representam música e outras faixas não faladas.",
+      "description": "Uma assinatura de tempo estimada. A assinatura de tempo (metro) é uma convenção de notação para especificar quantas batidas há em cada compasso (ou medida). \n\nA assinatura de tempo varia de 3 a 7, indicando assinaturas de tempo de \"3/4\" a \"7/4\".",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -769,8 +3336,9 @@
               "mode": "off"
             }
           },
+          "decimals": 0,
           "mappings": [],
-          "max": 1,
+          "max": 11,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -786,14 +3354,14 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
+        "w": 8,
+        "x": 16,
+        "y": 46
       },
-      "id": 6,
+      "id": 14,
       "options": {
         "barRadius": 0,
-        "barWidth": 0.97,
+        "barWidth": 0.9,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -805,9 +3373,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
+        "text": {},
         "tooltip": {
           "mode": "none",
           "sort": "none"
@@ -823,7 +3389,7 @@
           },
           "editorMode": "builder",
           "format": "table",
-          "rawSql": "SELECT genre, AVG(speechiness) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
+          "rawSql": "SELECT genre, AVG(time_signature) FROM tracks GROUP BY genre ORDER BY genre ",
           "refId": "A",
           "sql": {
             "columns": [
@@ -840,7 +3406,7 @@
                 "name": "AVG",
                 "parameters": [
                   {
-                    "name": "speechiness",
+                    "name": "time_signature",
                     "type": "functionParameter"
                   }
                 ],
@@ -856,7 +3422,6 @@
                 "type": "groupBy"
               }
             ],
-            "limit": 50,
             "orderBy": {
               "property": {
                 "name": [
@@ -867,550 +3432,10 @@
               "type": "property"
             }
           },
-          "table": "df_tracks"
+          "table": "tracks"
         }
       ],
-      "title": "Falabilidade por gênero",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-      },
-      "description": "Uma medida de confiança de 0.0 a 1.0 para saber se a faixa é acústica. \n\n1.0 representa alta confiança de que a faixa é acústica.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "média",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 1.1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
-      },
-      "id": 7,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
-        "tooltip": {
-          "mode": "none",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-          },
-          "editorMode": "builder",
-          "format": "table",
-          "rawSql": "SELECT genre, AVG(acousticness) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [
-                  {
-                    "name": "genre",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              },
-              {
-                "name": "AVG",
-                "parameters": [
-                  {
-                    "name": "acousticness",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "name": "genre",
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50,
-            "orderBy": {
-              "property": {
-                "name": [
-                  "genre"
-                ],
-                "type": "string"
-              },
-              "type": "property"
-            }
-          },
-          "table": "df_tracks"
-        }
-      ],
-      "title": "Acusticidade por gênero",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-      },
-      "description": "Prevê se uma faixa não contém vocais. Os sons \"Ooh\" e \"aah\" são tratados como instrumentais neste contexto. Faixas de rap ou palavras faladas são claramente \"vocais\". Quanto mais próximo o valor da instrumentalidade estiver de 1.0, maior será a probabilidade de a faixa não conter conteúdo vocal. \n\nValores acima de 0.5 pretendem representar faixas instrumentais, mas a confiança é maior à medida que o valor se aproxima de 1.0.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "média",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      },
-      "id": 8,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
-        "tooltip": {
-          "mode": "none",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-          },
-          "editorMode": "builder",
-          "format": "table",
-          "rawSql": "SELECT genre, AVG(instrumentalness) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [
-                  {
-                    "name": "genre",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              },
-              {
-                "name": "AVG",
-                "parameters": [
-                  {
-                    "name": "instrumentalness",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "name": "genre",
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50,
-            "orderBy": {
-              "property": {
-                "name": [
-                  "genre"
-                ],
-                "type": "string"
-              },
-              "type": "property"
-            }
-          },
-          "table": "df_tracks"
-        }
-      ],
-      "title": "Instrumentabilidade por gênero",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-      },
-      "description": "Detecta a presença de público na gravação. Valores mais altos de vivacidade representam uma probabilidade maior de que a faixa tenha sido tocada ao vivo. \n\nUm valor acima de 0.8 oferece forte probabilidade de que a faixa seja ao vivo.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "média",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 32
-      },
-      "id": 9,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
-        "tooltip": {
-          "mode": "none",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-          },
-          "editorMode": "builder",
-          "format": "table",
-          "rawSql": "SELECT genre, AVG(liveness) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [
-                  {
-                    "name": "genre",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              },
-              {
-                "name": "AVG",
-                "parameters": [
-                  {
-                    "name": "liveness",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "name": "genre",
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50,
-            "orderBy": {
-              "property": {
-                "name": [
-                  "genre"
-                ],
-                "type": "string"
-              },
-              "type": "property"
-            }
-          },
-          "table": "df_tracks"
-        }
-      ],
-      "title": "Vivacidade por gênero",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-      },
-      "description": "Uma medida de 0.0 a 1.0 que descreve a positividade musical transmitida por uma faixa. \n\nFaixas com alta valência soam mais positivas (por exemplo, feliz, alegre, eufórica), enquanto faixas com baixa valência soam mais negativas (por exemplo, triste, deprimida, irritada).",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "média",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 32
-      },
-      "id": 10,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "text": {
-          "valueSize": 23
-        },
-        "tooltip": {
-          "mode": "none",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "${DS_GRAFANA-POSTGRESQL-DATASOURCE}"
-          },
-          "editorMode": "builder",
-          "format": "table",
-          "rawSql": "SELECT genre, AVG(valence) FROM df_tracks GROUP BY genre ORDER BY genre LIMIT 50 ",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [
-                  {
-                    "name": "genre",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              },
-              {
-                "name": "AVG",
-                "parameters": [
-                  {
-                    "name": "valence",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "name": "genre",
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50,
-            "orderBy": {
-              "property": {
-                "name": [
-                  "genre"
-                ],
-                "type": "string"
-              },
-              "type": "property"
-            }
-          },
-          "table": "df_tracks"
-        }
-      ],
-      "title": "Valência por gênero",
+      "title": "Assinatura de tempo por gênero",
       "type": "barchart"
     }
   ],
@@ -1418,16 +3443,122 @@
   "schemaVersion": 39,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "5",
+          "value": "5"
+        },
+        "description": "Número máximo de resultados nos painéis de rankings.",
+        "hide": 0,
+        "includeAll": false,
+        "label": "TOP",
+        "multi": false,
+        "name": "top_rankings_limit",
+        "options": [
+          {
+            "selected": true,
+            "text": "5",
+            "value": "5"
+          },
+          {
+            "selected": false,
+            "text": "10",
+            "value": "10"
+          },
+          {
+            "selected": false,
+            "text": "25",
+            "value": "25"
+          },
+          {
+            "selected": false,
+            "text": "50",
+            "value": "50"
+          },
+          {
+            "selected": false,
+            "text": "100",
+            "value": "100"
+          }
+        ],
+        "query": "5,10,25,50,100",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "allValue": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "description": "Gêneros a serem mostrados nos painéis de rankings.",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Gênero",
+        "multi": true,
+        "name": "ranking_genres",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "classica",
+            "value": "classica"
+          },
+          {
+            "selected": false,
+            "text": "edm",
+            "value": "edm"
+          },
+          {
+            "selected": false,
+            "text": "pagode",
+            "value": "pagode"
+          },
+          {
+            "selected": false,
+            "text": "pop",
+            "value": "pop"
+          },
+          {
+            "selected": false,
+            "text": "rap",
+            "value": "rap"
+          },
+          {
+            "selected": false,
+            "text": "rock",
+            "value": "rock"
+          }
+        ],
+        "query": "classica,edm,pagode,pop,rap,rock",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "hidden": true
+  },
   "timezone": "browser",
   "title": "Default",
   "uid": "be39zzqq6udxcb",
-  "version": 10,
+  "version": 106,
   "weekStart": ""
 }
