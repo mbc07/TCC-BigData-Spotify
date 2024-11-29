@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 # Obtém faixas/artistas mais populares do usuário autenticado
 # https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
 

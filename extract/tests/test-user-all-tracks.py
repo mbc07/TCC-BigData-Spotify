@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 # Teste de estresse da API, obtém todas as faixas de cada álbum de cada artista seguido pelo usuário
 # Dados obtidos são salvos em arquivos JSON, na pasta do script
 

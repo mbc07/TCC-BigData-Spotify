@@ -1,8 +1,0 @@
-SET client_encoding TO 'UTF8';
-\i init_tables.sql
-\i pg_artists.sql
-\i pg_album.sql
-\i pg_images.sql
-\i pg_tracks.sql
-\i pg_artist_track.sql
-\i pg_image_track.sql

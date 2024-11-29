@@ -1,4 +1,0 @@
-crawler.py -p playlists.json
-crawler.py -a playlist_{}
-crawler.py -d playlist_{}
-crawler.py -f playlist_{} album_tracks_playlist_{}
